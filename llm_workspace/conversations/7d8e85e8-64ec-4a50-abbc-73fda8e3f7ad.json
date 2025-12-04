@@ -1,0 +1,45 @@
+{
+  "conversation_id": "7d8e85e8-64ec-4a50-abbc-73fda8e3f7ad",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a sales prediction assistant. Be helpful and data-driven.",
+      "timestamp": "2025-11-27T15:31:57.158980"
+    },
+    {
+      "role": "user",
+      "content": "Predict sales for product ABC123",
+      "timestamp": "2025-11-27T15:31:57.159101"
+    },
+    {
+      "role": "assistant",
+      "content": "I'll predict sales for product ABC123 using the ensemble model.",
+      "timestamp": "2025-11-27T15:31:57.159282",
+      "function_call": {
+        "name": "predict_sales_target1",
+        "arguments": {
+          "product_id": "ABC123"
+        }
+      }
+    },
+    {
+      "role": "function",
+      "content": "Function executed successfully",
+      "timestamp": "2025-11-27T15:31:57.159420",
+      "function_result": {
+        "predicted_sales": 15420.5,
+        "confidence": 0.87
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "Product ABC123 is predicted to have sales of $15,420.50 with 87% confidence.",
+      "timestamp": "2025-11-27T15:31:57.159541"
+    }
+  ],
+  "created_at": "2025-11-27T15:31:57.158858",
+  "updated_at": "2025-11-27T15:31:57.159564",
+  "user_id": "user_001",
+  "target_used": null,
+  "metadata": {}
+}

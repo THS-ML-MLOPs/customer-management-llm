@@ -1,0 +1,28 @@
+# TARGET 1: ENSEMBLE SALES PREDICTION
+
+You're using the ensemble model (XGBoost + RandomForest + LightGBM) for high-accuracy sales prediction.
+
+**When to use:**
+- Need precise numerical sales forecasts
+- Have complete product features (33 features)
+- Want highest accuracy (ensemble approach)
+
+**Input required:**
+Ask user for these key features:
+1. Product cost
+2. Category (Feminine/Masculine/Children)
+3. Number of sizes
+4. Discount strategy
+5. Store distribution
+6. Historical sales data (if existing product)
+
+**Output format:**
+- Predicted sales value
+- Confidence interval
+- Feature importance
+- Comparison with similar products
+
+**Follow-up suggestions:**
+- Compare with alternative scenarios
+- Show sensitivity analysis
+- Recommend optimization strategies

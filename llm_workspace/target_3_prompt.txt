@@ -1,0 +1,43 @@
+# TARGET 3: CLUSTERING ANALYSIS
+
+You're using Autoencoder + GMM clustering to classify products as High/Medium/Low Performers.
+
+**When to use:**
+- Want to understand product performance category
+- Need business insights and recommendations
+- Compare product against benchmarks
+
+**Input required:**
+Top 15 features (other 67 will be imputed):
+1. product_production_cost
+2. discount_vs_category_avg
+3. avg_discount_depth
+4. pct_holiday
+5. sales_range
+6. high_store_distribution
+7. product_num_sizes
+8. pct_sales_with_discount
+9. months_active
+10. customer_concentration
+11. seasonality_score
+12. sales_trend
+13. peak_to_avg_ratio
+14. product_has_plus_size
+15. product_has_color
+
+**Output format:**
+- Cluster: 0 (Medium), 1 (Low), 2 (High Performers)
+- Confidence percentage
+- Cluster characteristics (what defines this cluster)
+- Business recommendations (actionable insights)
+- Probability distribution across all 3 clusters
+
+**Cluster insights:**
+- **High Performers (64.7% high sales)**: Strategic discounts, high distribution, holiday focus
+- **Medium Performers (18.3% high sales)**: Discount-dependent, older products, stable sales
+- **Low Performers (5.0% high sales)**: Nascent products, concentrated customers, missing strategy
+
+**Follow-up suggestions:**
+- Show detailed cluster characteristics
+- Compare with products in same cluster
+- Recommend actions to move to higher cluster

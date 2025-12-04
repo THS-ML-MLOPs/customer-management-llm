@@ -1,0 +1,37 @@
+
+================================================================================
+    DEPLOYMENT SUMMARY - 2025-11-28 15:11:36
+================================================================================
+
+🔗 ACCESS URLS:
+---------------
+
+API Backend:
+https://precious-canonistic-ayden.ngrok-free.dev
+https://precious-canonistic-ayden.ngrok-free.dev/docs
+
+Target 3 - Sales Prediction UI:
+https://precious-canonistic-ayden.ngrok-free.dev
+
+Target 4 - Historical Analysis UI:
+https://precious-canonistic-ayden.ngrok-free.dev
+
+⏰ SESSION INFO:
+----------------
+Started: 2025-11-28 15:11:36
+Valid for: ~1 hour (Ngrok free tier)
+
+💡 TIPS:
+--------
+- Bookmark these URLs for quick access
+- Share with team members
+- URLs expire when Colab session ends
+- Re-run this cell to get new URLs
+
+🔧 TROUBLESHOOTING:
+-------------------
+- If URL doesn't load: wait 30 seconds, refresh
+- If "tunnel not found": re-run this cell
+- If API errors: check Health endpoint first
+
+================================================================================

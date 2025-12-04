@@ -1,0 +1,23 @@
+{
+  "models": "/content/drive/MyDrive/ML_Projects/Customer_Management/models",
+  "target1_model": "/content/drive/MyDrive/ML_Projects/Customer_Management/models/target_1_complete.pkl",
+  "target1_metadata": "/content/drive/MyDrive/ML_Projects/Customer_Management/models/target_1_metadata.json",
+  "target3_encoder": "/content/drive/MyDrive/ML_Projects/Customer_Management/models/target_3_encoder.keras",
+  "target3_gmm": "/content/drive/MyDrive/ML_Projects/Customer_Management/models/target_3_clustering_gmm_k3_final.pkl",
+  "target3_logreg": "/content/drive/MyDrive/ML_Projects/Customer_Management/models/target_3_logreg_interpretability.pkl",
+  "target3_clusters": "/content/drive/MyDrive/ML_Projects/Customer_Management/models/target_3_cluster_labels.parquet",
+  "target4_model": "/content/drive/MyDrive/ML_Projects/Customer_Management/data/processed/ML_dataset_ready/target_4_gnn/PHASE_3_4_OPTIMIZATION/models/final_model_best.pt",
+  "target4_config": "/content/drive/MyDrive/ML_Projects/Customer_Management/data/processed/ML_dataset_ready/target_4_gnn/PHASE_3_4_OPTIMIZATION/models/final_model_config.json",
+  "target4_graph_nodes": "/content/drive/MyDrive/ML_Projects/Customer_Management/data/processed/ML_dataset_ready/target_4_gnn/graph_nodes.parquet",
+  "target5_faiss": "/content/drive/MyDrive/ML_Projects/Customer_Management/faiss_index.bin",
+  "target5_embeddings": "/content/drive/MyDrive/ML_Projects/Customer_Management/product_embeddings.npy",
+  "target5_mapping": "/content/drive/MyDrive/ML_Projects/Customer_Management/embedding_mapping.parquet",
+  "data_processed": "/content/drive/MyDrive/ML_Projects/Customer_Management/data/processed",
+  "transactions": "/content/drive/MyDrive/ML_Projects/Customer_Management/data/processed/transactions_enriched.parquet",
+  "train_scaled": "/content/drive/MyDrive/ML_Projects/Customer_Management/data/processed/ML_dataset_ready/target_3_clustering/train_scaled_82.parquet",
+  "llm_workspace": "/content/drive/MyDrive/ML_Projects/Customer_Management/llm_workspace",
+  "feedback_db": "/content/drive/MyDrive/ML_Projects/Customer_Management/llm_workspace/feedback.db",
+  "conversations": "/content/drive/MyDrive/ML_Projects/Customer_Management/llm_workspace/conversations",
+  "logs": "/content/drive/MyDrive/ML_Projects/Customer_Management/llm_workspace/logs",
+  "rlhf_data": "/content/drive/MyDrive/ML_Projects/Customer_Management/llm_workspace/rlhf_data"
+}

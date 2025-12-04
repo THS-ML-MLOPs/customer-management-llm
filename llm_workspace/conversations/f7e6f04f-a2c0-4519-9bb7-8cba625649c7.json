@@ -1,0 +1,30 @@
+{
+  "conversation_id": "f7e6f04f-a2c0-4519-9bb7-8cba625649c7",
+  "messages": [
+    {
+      "role": "user",
+      "content": "What are top products?",
+      "timestamp": "2025-11-28T14:29:37.212361"
+    },
+    {
+      "role": "assistant",
+      "content": "Response to: What are top products?\n\n\ud83d\udca1 Next Steps:\n- Explore data\n- Generate charts\n\n\u2753 Questions:\n- Need more details?",
+      "timestamp": "2025-11-28T14:29:37.212378"
+    },
+    {
+      "role": "user",
+      "content": "Show me charts for those",
+      "timestamp": "2025-11-28T14:29:37.217707"
+    },
+    {
+      "role": "assistant",
+      "content": "Response to: Show me charts for those\n\n\ud83d\udca1 Next Steps:\n- Explore data\n- Generate charts\n\n\u2753 Questions:\n- Need more details?",
+      "timestamp": "2025-11-28T14:29:37.217734"
+    }
+  ],
+  "created_at": "2025-11-28T14:29:37.212339",
+  "updated_at": "2025-11-28T14:29:37.217738",
+  "user_id": "e2e_test",
+  "target_used": null,
+  "metadata": null
+}

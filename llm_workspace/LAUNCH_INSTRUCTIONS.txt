@@ -1,0 +1,65 @@
+
+================================================================================
+    STREAMLIT UIs - LAUNCH INSTRUCTIONS
+================================================================================
+
+PREREQUISITES:
+--------------
+1. API must be running on port 8000
+2. Install Streamlit requirements:
+   pip install -r requirements_streamlit.txt
+
+LAUNCH STEPS:
+-------------
+
+Terminal 1 - API Server (if not running):
+------------------------------------------
+cd /path/to/project
+python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+Terminal 2 - Target 3 (Sales Prediction UI):
+--------------------------------------------
+cd /path/to/llm_workspace
+streamlit run app_target3.py --server.port 8501
+
+Terminal 3 - Target 4 (Historical Analysis UI):
+-----------------------------------------------
+cd /path/to/llm_workspace
+streamlit run app_target4.py --server.port 8502
+
+ACCESS URLS:
+------------
+- API Documentation: http://localhost:8000/docs
+- Target 3 UI: http://localhost:8501
+- Target 4 UI: http://localhost:8502
+
+NOTES:
+------
+- Both UIs require the FastAPI backend to be running
+- Default API URL is http://localhost:8000 (configurable in each app)
+- Use Ctrl+C to stop any server
+- UIs auto-reload on code changes (Streamlit feature)
+
+TROUBLESHOOTING:
+----------------
+- If port is in use, change --server.port to another number
+- If API connection fails, check API is running on port 8000
+- For CORS issues, ensure API CORS middleware allows all origins
+
+FEATURES:
+---------
+Target 3 - Sales Prediction:
+  ✓ Product/Store selection with filters
+  ✓ Date picker for predictions
+  ✓ Visual prediction charts
+  ✓ Confidence intervals
+  ✓ Export to CSV/JSON
+
+Target 4 - Historical Analysis:
+  ✓ Natural language queries
+  ✓ SQL query viewer
+  ✓ Auto-generated charts
+  ✓ Export to CSV/Excel/JSON
+  ✓ Query history
+
+================================================================================

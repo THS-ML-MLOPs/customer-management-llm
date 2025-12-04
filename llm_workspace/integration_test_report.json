@@ -1,0 +1,156 @@
+{
+  "executed_at": "2025-11-28T14:29:40.336540",
+  "total_tests": 24,
+  "passed": 19,
+  "failed": 5,
+  "skipped": 0,
+  "pass_rate": 79.16666666666666,
+  "quality": "ACCEPTABLE \u2b50\u2b50\u2b50",
+  "suites": [
+    {
+      "name": "Suite 1: Core LLM",
+      "tests": [
+        {
+          "name": "Ollama Connection",
+          "status": "passed",
+          "detail": "Connected"
+        },
+        {
+          "name": "System Prompt",
+          "status": "passed",
+          "detail": "3261 chars"
+        },
+        {
+          "name": "SQL Guardrails",
+          "status": "passed",
+          "detail": "4/4"
+        },
+        {
+          "name": "Off-topic Detection",
+          "status": "passed",
+          "detail": "4/4"
+        },
+        {
+          "name": "Conversation Mgmt",
+          "status": "passed",
+          "detail": "Save/load OK"
+        },
+        {
+          "name": "Feedback System",
+          "status": "failed",
+          "detail": "Cannot operate on a closed database."
+        }
+      ]
+    },
+    {
+      "name": "Suite 2: Data Layer",
+      "tests": [
+        {
+          "name": "DuckDB Connection",
+          "status": "passed",
+          "detail": "6,416,827 rows"
+        },
+        {
+          "name": "Database Views",
+          "status": "passed",
+          "detail": "7/7"
+        },
+        {
+          "name": "NL\u2192SQL",
+          "status": "passed",
+          "detail": "3/3"
+        },
+        {
+          "name": "Query Execution",
+          "status": "passed",
+          "detail": "3 rows"
+        }
+      ]
+    },
+    {
+      "name": "Suite 3: Charts",
+      "tests": [
+        {
+          "name": "Chart Generation",
+          "status": "passed",
+          "detail": "newly_generated"
+        },
+        {
+          "name": "Cache Hit",
+          "status": "passed",
+          "detail": "Count: 2"
+        },
+        {
+          "name": "Asset Search",
+          "status": "passed",
+          "detail": "9 found"
+        },
+        {
+          "name": "Feature Charts",
+          "status": "failed",
+          "detail": "'chart_type'"
+        },
+        {
+          "name": "Cache Stats",
+          "status": "passed",
+          "detail": "6 charts"
+        }
+      ]
+    },
+    {
+      "name": "Suite 4: API",
+      "tests": [
+        {
+          "name": "Health Check",
+          "status": "passed",
+          "detail": "1.0.0"
+        },
+        {
+          "name": "Chat Endpoint",
+          "status": "passed",
+          "detail": "Success"
+        },
+        {
+          "name": "Query Endpoint",
+          "status": "passed",
+          "detail": "5 rows"
+        },
+        {
+          "name": "Chart Endpoint",
+          "status": "passed",
+          "detail": "newly_generated"
+        },
+        {
+          "name": "Search Endpoint",
+          "status": "passed",
+          "detail": "1 results"
+        },
+        {
+          "name": "Feedback Endpoint",
+          "status": "failed",
+          "detail": "500: Cannot operate on a closed database."
+        }
+      ]
+    },
+    {
+      "name": "Suite 5: E2E",
+      "tests": [
+        {
+          "name": "E2E Prediction",
+          "status": "failed",
+          "detail": "Cannot operate on a closed database."
+        },
+        {
+          "name": "Multi-turn Chat",
+          "status": "passed",
+          "detail": "4 msgs"
+        },
+        {
+          "name": "Cache Performance",
+          "status": "failed",
+          "detail": "1.0x"
+        }
+      ]
+    }
+  ]
+}

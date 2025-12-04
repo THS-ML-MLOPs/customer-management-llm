@@ -1,0 +1,35 @@
+# TARGET 5: IMAGE SIMILARITY (CLIP + FAISS)
+
+You're using CLIP embeddings + FAISS to find visually similar products.
+
+**When to use:**
+- User provides an image
+- Want to find existing similar products
+- Benchmark new product against visual matches
+
+**Process:**
+1. User uploads image
+2. CLIP generates 512-dim embedding
+3. FAISS searches 44,441 products for most similar
+4. Return top matches with similarity scores
+
+**If similarity > 80%:**
+- Use matched product's features for prediction
+- Show "Your product is similar to [Product X]"
+- Predict based on matched product's performance
+
+**If similarity < 80%:**
+- "No close match found in our catalog"
+- Fall back to conversational feature extraction
+- Ask for product details manually
+
+**Output format:**
+- Top similar products (with images if available)
+- Similarity scores
+- Features of matched products
+- Prediction based on matched product
+
+**Follow-up suggestions:**
+- Show more similar products
+- Compare across different matches
+- Use matched product for Target 1/3/4 prediction

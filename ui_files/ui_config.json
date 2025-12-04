@@ -1,0 +1,16 @@
+{
+  "created_at": "2025-12-02T08:41:25.248231",
+  "base_path": "/content/drive/MyDrive/ML_Projects/Customer_Management",
+  "paths": {
+    "base": "/content/drive/MyDrive/ML_Projects/Customer_Management",
+    "data": "/content/drive/MyDrive/ML_Projects/Customer_Management/data",
+    "models": "/content/drive/MyDrive/ML_Projects/Customer_Management/models",
+    "dashboards": "/content/drive/MyDrive/ML_Projects/Customer_Management/dashboards",
+    "churn_dashboard": "/content/drive/MyDrive/ML_Projects/Customer_Management/dashboards/01_churn_risk/dashboard_complete_churn_risk.html",
+    "llm_workspace": "/content/drive/MyDrive/ML_Projects/Customer_Management/llm_workspace",
+    "conversations": "/content/drive/MyDrive/ML_Projects/Customer_Management/llm_workspace/conversations",
+    "charts": "/content/drive/MyDrive/ML_Projects/Customer_Management/llm_workspace/charts",
+    "ui_files": "/content/drive/MyDrive/ML_Projects/Customer_Management/ui_files"
+  },
+  "status": "configured"
+}

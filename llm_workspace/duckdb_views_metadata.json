@@ -1,0 +1,122 @@
+{
+  "views": {
+    "stores": {
+      "row_count": 35,
+      "column_count": 10,
+      "columns": [
+        "store_id",
+        "store_store_id",
+        "store_name",
+        "country",
+        "city",
+        "continent",
+        "is_eu",
+        "employee_count",
+        "latitude",
+        "longitude"
+      ]
+    },
+    "customers": {
+      "row_count": 1283707,
+      "column_count": 10,
+      "columns": [
+        "customer_id",
+        "name",
+        "email",
+        "country",
+        "city",
+        "gender",
+        "age",
+        "age_group",
+        "job_title",
+        "date_of_birth"
+      ]
+    },
+    "products": {
+      "row_count": 17940,
+      "column_count": 13,
+      "columns": [
+        "product_id",
+        "category",
+        "subcategory",
+        "description",
+        "production_cost",
+        "has_color",
+        "has_plus_size",
+        "num_sizes",
+        "avg_revenue",
+        "avg_profit",
+        "avg_price",
+        "num_transactions",
+        "total_quantity_sold"
+      ]
+    },
+    "temporal_category": {
+      "row_count": 81,
+      "column_count": 9,
+      "columns": [
+        "month",
+        "category",
+        "total_revenue",
+        "total_profit",
+        "num_transactions",
+        "avg_revenue",
+        "avg_profit",
+        "total_quantity",
+        "avg_discount"
+      ]
+    },
+    "temporal_country": {
+      "row_count": 189,
+      "column_count": 9,
+      "columns": [
+        "month",
+        "country",
+        "continent",
+        "total_revenue",
+        "total_profit",
+        "num_transactions",
+        "avg_revenue",
+        "unique_customers",
+        "unique_products"
+      ]
+    },
+    "discounts": {
+      "row_count": 17940,
+      "column_count": 11,
+      "columns": [
+        "product_id",
+        "category",
+        "avg_discount_pct",
+        "max_discount",
+        "min_discount",
+        "discount_frequency",
+        "total_transactions",
+        "avg_revenue_with_discount",
+        "avg_revenue_no_discount",
+        "has_black_friday",
+        "has_holiday_season"
+      ]
+    },
+    "sales_metrics": {
+      "row_count": 567,
+      "column_count": 13,
+      "columns": [
+        "month",
+        "category",
+        "country",
+        "revenue",
+        "profit",
+        "quantity_sold",
+        "num_sales",
+        "unique_customers",
+        "unique_products",
+        "avg_unit_price",
+        "avg_discount",
+        "num_returns",
+        "returns_revenue"
+      ]
+    }
+  },
+  "total_transactions": 6416827
+}

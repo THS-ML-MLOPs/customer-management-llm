@@ -1,0 +1,20 @@
+{
+  "conversation_id": "cdf17069-3c18-469d-925d-9d2f628d7530",
+  "messages": [
+    {
+      "role": "user",
+      "content": "What are the top selling products?",
+      "timestamp": "2025-11-28T14:25:17.088601"
+    },
+    {
+      "role": "assistant",
+      "content": "Response to: What are the top selling products?\n\n\ud83d\udca1 Next Steps:\n- Explore data\n- Generate charts\n\n\u2753 Questions:\n- Need more details?",
+      "timestamp": "2025-11-28T14:25:17.088624"
+    }
+  ],
+  "created_at": "2025-11-28T14:25:17.088575",
+  "updated_at": "2025-11-28T14:25:17.088627",
+  "user_id": "test_user_fix",
+  "target_used": null,
+  "metadata": null
+}

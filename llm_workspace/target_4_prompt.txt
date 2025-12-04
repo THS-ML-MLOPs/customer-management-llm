@@ -1,0 +1,30 @@
+# TARGET 4: GRAPH NEURAL NETWORK
+
+You're using a GNN that leverages product relationships, taxonomy, and network effects.
+
+**When to use:**
+- Product has strong relationships with others (bought together, similar)
+- Want to leverage network structure
+- Category/subcategory relationships matter
+
+**Input required:**
+- Product ID (if existing) or
+- Product features + category/subcategory
+- The model will use graph structure automatically
+
+**What makes this special:**
+- Considers "bought with" relationships
+- Uses "similar to" product connections
+- Leverages category/subcategory taxonomy
+- Captures network effects
+
+**Output format:**
+- Predicted class: Low/Medium/High
+- Confidence score
+- Important graph connections (which relationships mattered)
+- Network context (position in graph)
+
+**Follow-up suggestions:**
+- Show product's neighbors in graph
+- Analyze relationship patterns
+- Suggest products to create relationships with

@@ -1,0 +1,165 @@
+{
+  "a3af1f6f": {
+    "query_nl": "Feature: product_affinity_matrix",
+    "query_sql": null,
+    "chart_type": "heatmap",
+    "file_path": "/content/drive/MyDrive/ML_Projects/Customer_Management/llm_workspace/charts/feature_product_affinity_matrix_a3af1f6f.html",
+    "data_hash": "ab6bde0b",
+    "data_columns": [
+      "product_id_1",
+      "product_id_2",
+      "category_1",
+      "subcategory_1",
+      "category_2",
+      "subcategory_2",
+      "co_purchase_count",
+      "support_1",
+      "support_2",
+      "support_pair",
+      "confidence_1_to_2",
+      "confidence_2_to_1",
+      "lift",
+      "affinity_strength"
+    ],
+    "num_data_points": 32079,
+    "created_at": "2025-11-28T10:13:48.254672",
+    "last_accessed": "2025-11-28T14:45:32.348079",
+    "access_count": 8
+  },
+  "0f2a4dad": {
+    "query_nl": "Total revenue by category",
+    "query_sql": "Show me total revenue by category",
+    "chart_type": "bar",
+    "file_path": "/content/drive/MyDrive/ML_Projects/Customer_Management/llm_workspace/charts/chart_0f2a4dad.html",
+    "data_hash": "f7ea53fb",
+    "data_columns": [
+      "category",
+      "total_rev"
+    ],
+    "num_data_points": 3,
+    "created_at": "2025-11-28T14:24:05.215893",
+    "last_accessed": "2025-11-28T14:24:06.577135",
+    "access_count": 2
+  },
+  "65cb46ee": {
+    "query_nl": "Top products by profit",
+    "query_sql": "Show me top 10 products by average profit",
+    "chart_type": "bar",
+    "file_path": "/content/drive/MyDrive/ML_Projects/Customer_Management/llm_workspace/charts/chart_65cb46ee.html",
+    "data_hash": "43285dca",
+    "data_columns": [
+      "product_id",
+      "category",
+      "avg_profit"
+    ],
+    "num_data_points": 10,
+    "created_at": "2025-11-28T10:24:45.446095",
+    "last_accessed": "2025-11-28T14:23:47.904980",
+    "access_count": 2
+  },
+  "2c155c3d": {
+    "query_nl": "Revenue by category",
+    "query_sql": "Show me total revenue by category",
+    "chart_type": "bar",
+    "file_path": "/content/drive/MyDrive/ML_Projects/Customer_Management/llm_workspace/charts/chart_2c155c3d.html",
+    "data_hash": "f7ea53fb",
+    "data_columns": [
+      "category",
+      "total_rev"
+    ],
+    "num_data_points": 3,
+    "created_at": "2025-11-28T11:19:50.628105",
+    "last_accessed": "2025-11-28T14:24:32.957269",
+    "access_count": 2
+  },
+  "c972925f": {
+    "query_nl": "Top countries by revenue",
+    "query_sql": "Which countries have the highest revenue?",
+    "chart_type": "bar",
+    "file_path": "/content/drive/MyDrive/ML_Projects/Customer_Management/llm_workspace/charts/chart_c972925f.html",
+    "data_hash": "d26ce700",
+    "data_columns": [
+      "country",
+      "revenue"
+    ],
+    "num_data_points": 7,
+    "created_at": "2025-11-28T14:24:07.964815",
+    "last_accessed": "2025-11-28T14:24:07.964831",
+    "access_count": 1
+  },
+  "21d508de": {
+    "query_nl": "Integration test - revenue chart",
+    "query_sql": "Show total revenue by category",
+    "chart_type": "bar",
+    "file_path": "/content/drive/MyDrive/ML_Projects/Customer_Management/llm_workspace/charts/chart_21d508de.html",
+    "data_hash": "f7ea53fb",
+    "data_columns": [
+      "category",
+      "total_rev"
+    ],
+    "num_data_points": 3,
+    "created_at": "2025-11-28T14:29:29.800047",
+    "last_accessed": "2025-11-28T14:29:31.279979",
+    "access_count": 2
+  },
+  "57c48e6e": {
+    "query_nl": "Integration test chart",
+    "query_sql": "Revenue by country",
+    "chart_type": "bar",
+    "file_path": "/content/drive/MyDrive/ML_Projects/Customer_Management/llm_workspace/charts/chart_57c48e6e.html",
+    "data_hash": "d26ce700",
+    "data_columns": [
+      "country",
+      "revenue"
+    ],
+    "num_data_points": 7,
+    "created_at": "2025-11-28T14:29:34.172071",
+    "last_accessed": "2025-11-28T14:29:34.172088",
+    "access_count": 1
+  },
+  "4ee3c566": {
+    "query_nl": "E2E workflow chart",
+    "query_sql": "Revenue by category",
+    "chart_type": "bar",
+    "file_path": "/content/drive/MyDrive/ML_Projects/Customer_Management/llm_workspace/charts/chart_4ee3c566.html",
+    "data_hash": "1ce957bc",
+    "data_columns": [
+      "category",
+      "revenue"
+    ],
+    "num_data_points": 3,
+    "created_at": "2025-11-28T14:29:37.207437",
+    "last_accessed": "2025-11-28T14:29:37.207451",
+    "access_count": 1
+  },
+  "c899a259": {
+    "query_nl": "Cache perf test",
+    "query_sql": "Top countries by revenue",
+    "chart_type": "bar",
+    "file_path": "/content/drive/MyDrive/ML_Projects/Customer_Management/llm_workspace/charts/chart_c899a259.html",
+    "data_hash": "2c5eda09",
+    "data_columns": [
+      "country",
+      "rev"
+    ],
+    "num_data_points": 7,
+    "created_at": "2025-11-28T14:29:38.809014",
+    "last_accessed": "2025-11-28T14:29:40.328741",
+    "access_count": 2
+  },
+  "22b5b31a": {
+    "query_nl": "Validation workflow chart",
+    "query_sql": "Revenue by category",
+    "chart_type": "bar",
+    "file_path": "/content/drive/MyDrive/ML_Projects/Customer_Management/llm_workspace/charts/chart_22b5b31a.html",
+    "data_hash": "f7ea53fb",
+    "data_columns": [
+      "category",
+      "total_rev"
+    ],
+    "num_data_points": 3,
+    "created_at": "2025-11-28T14:45:32.334115",
+    "last_accessed": "2025-11-28T14:45:32.334127",
+    "access_count": 1
+  }
+}

@@ -1,0 +1,233 @@
+[
+  {
+    "name": "predict_sales_target1",
+    "description": "Predict sales using ensemble model (XGBoost + RandomForest + LightGBM). Most accurate for numerical forecasts. Requires 33 product features.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "product_id": {
+          "type": "string",
+          "description": "Product ID if querying existing product, or null for new product"
+        },
+        "features": {
+          "type": "object",
+          "description": "Product features dict (33 features). If product_id provided, features are optional.",
+          "properties": {
+            "product_cost": {
+              "type": "number"
+            },
+            "category": {
+              "type": "string",
+              "enum": [
+                "Feminine",
+                "Masculine",
+                "Children"
+              ]
+            },
+            "num_sizes": {
+              "type": "integer"
+            },
+            "discount_strategy": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "required": [
+        "product_id"
+      ]
+    }
+  },
+  {
+    "name": "predict_cluster_target3",
+    "description": "Classify product as High/Medium/Low Performer using clustering. Provides business insights and recommendations. Requires top 15 features (others imputed).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "product_id": {
+          "type": "string",
+          "description": "Product ID if existing, or null for new product"
+        },
+        "features": {
+          "type": "object",
+          "description": "Top 15 critical features. Missing features will be imputed with dataset means.",
+          "properties": {
+            "product_production_cost": {
+              "type": "number"
+            },
+            "discount_vs_category_avg": {
+              "type": "number"
+            },
+            "avg_discount_depth": {
+              "type": "number"
+            },
+            "pct_holiday": {
+              "type": "number"
+            },
+            "sales_range": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "predict_sales_target4",
+    "description": "Predict sales using Graph Neural Network. Leverages product relationships, taxonomy, and network effects. Best when relationships matter.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "product_id": {
+          "type": "string",
+          "description": "Product ID (required for GNN to access graph)"
+        },
+        "include_neighbors": {
+          "type": "boolean",
+          "description": "Include neighbor analysis in response",
+          "default": false
+        }
+      },
+      "required": [
+        "product_id"
+      ]
+    }
+  },
+  {
+    "name": "find_similar_products",
+    "description": "Find visually similar products using CLIP + FAISS. User uploads image or provides image URL.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "image_base64": {
+          "type": "string",
+          "description": "Base64 encoded image"
+        },
+        "top_k": {
+          "type": "integer",
+          "description": "Number of similar products to return",
+          "default": 5
+        },
+        "similarity_threshold": {
+          "type": "number",
+          "description": "Minimum similarity score (0-1)",
+          "default": 0.7
+        }
+      },
+      "required": [
+        "image_base64"
+      ]
+    }
+  },
+  {
+    "name": "query_data",
+    "description": "Query historical sales data using DuckDB. Only SELECT queries allowed on approved views: stores, customers, products, temporal_category, temporal_country, discounts.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "natural_language_query": {
+          "type": "string",
+          "description": "Natural language description of what data user wants. Will be converted to SQL."
+        },
+        "sql_query": {
+          "type": "string",
+          "description": "Direct SQL query (optional, will be validated)"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "Max rows to return",
+          "default": 100
+        }
+      },
+      "required": [
+        "natural_language_query"
+      ]
+    }
+  },
+  {
+    "name": "generate_chart",
+    "description": "Generate interactive Plotly chart from data. Searches for existing charts first, creates new if needed.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "chart_description": {
+          "type": "string",
+          "description": "What chart user wants (e.g., 'sales by category in 2024')"
+        },
+        "data": {
+          "type": "object",
+          "description": "Data to visualize (from query_data or prediction results)"
+        },
+        "chart_type": {
+          "type": "string",
+          "enum": [
+            "bar",
+            "line",
+            "scatter",
+            "pie",
+            "histogram"
+          ],
+          "description": "Type of chart"
+        }
+      },
+      "required": [
+        "chart_description"
+      ]
+    }
+  },
+  {
+    "name": "search_existing_assets",
+    "description": "Search for existing dashboards, charts, or reports in /dashboards and /features directories before generating new ones.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "What asset to search for (e.g., 'sales dashboard 2024', 'Lisboa store chart')"
+        },
+        "asset_type": {
+          "type": "string",
+          "enum": [
+            "dashboard",
+            "chart",
+            "report",
+            "all"
+          ],
+          "default": "all"
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+  },
+  {
+    "name": "compare_scenarios",
+    "description": "Compare different product scenarios or predictions side-by-side.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "scenario_a": {
+          "type": "object",
+          "description": "First scenario (product features or ID)"
+        },
+        "scenario_b": {
+          "type": "object",
+          "description": "Second scenario (product features or ID)"
+        },
+        "comparison_metrics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "What to compare (sales, cluster, confidence, etc)"
+        }
+      },
+      "required": [
+        "scenario_a",
+        "scenario_b"
+      ]
+    }
+  }
+]

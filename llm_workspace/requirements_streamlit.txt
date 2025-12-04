@@ -1,0 +1,9 @@
+# Streamlit UI Requirements
+streamlit==1.31.0
+plotly==5.18.0
+pandas==2.1.4
+requests==2.31.0
+numpy==1.26.3
+openpyxl==3.1.2
+xlsxwriter==3.1.9
+python-multipart==0.0.6
