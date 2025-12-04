@@ -6,7 +6,7 @@
 """
 
 import streamlit as st
-from backend.llm_client import get_llm_client
+from ui_files.backend.llm_client import get_llm_client
 import uuid
 from datetime import datetime
 from PIL import Image

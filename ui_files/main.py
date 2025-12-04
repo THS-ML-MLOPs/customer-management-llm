@@ -14,14 +14,14 @@ UI_PATH = Path(__file__).parent
 sys.path.insert(0, str(UI_PATH))
 
 # Import configurations
-from config.styles import load_styles
-from config.paths import PATHS
+from ui_files.config.styles import load_styles
+from ui_files.config.paths import PATHS
 
 # Import utilities
-from utils.session_state import init_session_state, get_current_view
+from ui_files.utils.session_state import init_session_state, get_current_view
 
 # Import views
-from views import home, churn_dashboard
+from ui_files.views import home, churn_dashboard
 
 # ============================================================================
 # PAGE CONFIGURATION
