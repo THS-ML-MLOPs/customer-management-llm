@@ -1,16 +1,11 @@
 """
 ================================================================================
-    CUSTOMER MANAGEMENT SYSTEM - FASTAPI BACKEND (HUGGING FACE VERSION)
-    Complete LLM API with Hugging Face, DuckDB, and CLIP
-    No Ollama installation needed!
+    CUSTOMER MANAGEMENT SYSTEM - HUGGING FACE CLIENT (STREAMLIT VERSION)
+    Core functionality for HuggingFace, DuckDB, and CLIP
+    No FastAPI needed - optimized for Streamlit Cloud
 ================================================================================
 """
 
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any
-from datetime import datetime
 import os
 import json
 import sqlite3
@@ -18,6 +13,8 @@ import uuid
 import base64
 import io
 from pathlib import Path
+from typing import Optional, List, Dict, Any
+from datetime import datetime
 import logging
 
 # Hugging Face
@@ -71,78 +68,6 @@ data_loader = get_data_loader()
 logger.info(f"Environment: {detect_environment()}")
 logger.info(f"Project Root: {PROJECT_ROOT}")
 logger.info(f"Data Loader initialized - will load from HF Dataset")
-
-# ============================================================================
-# FASTAPI APP SETUP
-# ============================================================================
-
-app = FastAPI(
-    title="Customer Management LLM API (HF Version)",
-    description="Complete API with Hugging Face, DuckDB, and CLIP",
-    version="2.0.0"
-)
-
-# CORS - Allow all origins
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# ============================================================================
-# PYDANTIC MODELS
-# ============================================================================
-
-class ChatRequest(BaseModel):
-    message: str
-    conversation_id: Optional[str] = None
-    stream: bool = False
-
-class ChatResponse(BaseModel):
-    success: bool
-    response: Optional[str] = None
-    message_id: Optional[str] = None
-    conversation_id: Optional[str] = None
-    error: Optional[str] = None
-
-class QueryRequest(BaseModel):
-    query: str
-    parameters: Optional[Dict] = {}
-
-class QueryResponse(BaseModel):
-    success: bool
-    data: Optional[List[Dict]] = None
-    sql_used: Optional[str] = None
-    execution_time: Optional[float] = None
-    error: Optional[str] = None
-
-class ChartRequest(BaseModel):
-    data: Dict
-    chart_type: str
-    title: str
-    config: Optional[Dict] = {}
-
-class ChartResponse(BaseModel):
-    success: bool
-    chart_html: Optional[str] = None
-    chart_json: Optional[Dict] = None
-    error: Optional[str] = None
-
-class ImageSearchRequest(BaseModel):
-    image: str  # base64 encoded
-    top_k: int = 5
-
-class ImageSearchResponse(BaseModel):
-    success: bool
-    products: Optional[List[Dict]] = None
-    error: Optional[str] = None
-
-class FeedbackRequest(BaseModel):
-    message_id: str
-    feedback_type: str  # 'like' or 'dislike'
-    comment: Optional[str] = None
 
 # ============================================================================
 # HUGGING FACE INTEGRATION
@@ -598,252 +523,14 @@ class FeedbackManager:
 FeedbackManager.init_db()
 
 # ============================================================================
-# API ENDPOINTS
+# MODULE INITIALIZATION
 # ============================================================================
 
-@app.get("/")
-async def root():
-    """Root endpoint"""
-    return {
-        "name": "Customer Management LLM API (HuggingFace)",
-        "version": "2.0.0",
-        "status": "operational",
-        "llm": "Llama-3.1-8B-Instruct (HuggingFace)",
-        "endpoints": {
-            "health": "/health",
-            "docs": "/docs",
-            "chat": "/chat",
-            "query": "/query",
-            "chart": "/chart",
-            "search_image": "/search_image",
-            "conversation": "/conversation/{id}",
-            "feedback": "/feedback"
-        }
-    }
-
-@app.get("/health")
-async def health_check():
-    """Health check endpoint"""
-
-    # Check HuggingFace
-    hf_status = hf_client.is_available()
-
-    # Check DuckDB
-    duckdb_status = False
-    try:
-        duckdb_client.get_connection()
-        duckdb_status = True
-    except:
-        pass
-
-    return {
-        "status": "healthy" if (hf_status and duckdb_status) else "degraded",
-        "timestamp": datetime.now().isoformat(),
-        "services": {
-            "huggingface": "online" if hf_status else "offline",
-            "duckdb": "online" if duckdb_status else "offline",
-            "clip": "ready" if clip_searcher._initialized else "not_loaded"
-        },
-        "environment": detect_environment(),
-        "project_root": str(PROJECT_ROOT)
-    }
-
-@app.post("/chat", response_model=ChatResponse)
-async def chat(request: ChatRequest):
-    """
-    Chat endpoint with HuggingFace LLM
-    """
-    try:
-        # Generate conversation ID if not provided
-        conversation_id = request.conversation_id or str(uuid.uuid4())
-
-        # Load conversation history
-        history = ConversationStorage.load(conversation_id)
-
-        # Get response from HuggingFace
-        response_text = hf_client.chat(request.message, history)
-
-        # Generate message ID
-        message_id = str(uuid.uuid4())
-
-        # Update history
-        history.append({"role": "user", "content": request.message})
-        history.append({"role": "assistant", "content": response_text, "message_id": message_id})
-
-        # Save conversation
-        ConversationStorage.save(conversation_id, history)
-
-        return ChatResponse(
-            success=True,
-            response=response_text,
-            message_id=message_id,
-            conversation_id=conversation_id
-        )
-
-    except Exception as e:
-        logger.error(f"Chat error: {str(e)}")
-        return ChatResponse(
-            success=False,
-            error=str(e)
-        )
-
-@app.post("/query", response_model=QueryResponse)
-async def query_data(request: QueryRequest):
-    """
-    Execute natural language query on data
-    """
-    try:
-        import time
-        start_time = time.time()
-
-        # Convert natural language to SQL
-        sql = duckdb_client.natural_language_to_sql(request.query)
-
-        logger.info(f"Generated SQL: {sql}")
-
-        # Execute query
-        results = duckdb_client.query(sql)
-
-        execution_time = time.time() - start_time
-
-        return QueryResponse(
-            success=True,
-            data=results,
-            sql_used=sql,
-            execution_time=execution_time
-        )
-
-    except Exception as e:
-        logger.error(f"Query error: {str(e)}")
-        return QueryResponse(
-            success=False,
-            error=str(e)
-        )
-
-@app.post("/chart", response_model=ChartResponse)
-async def generate_chart(request: ChartRequest):
-    """
-    Generate Plotly chart
-    """
-    try:
-        chart_html = generate_plotly_chart(
-            request.data,
-            request.chart_type,
-            request.title,
-            request.config
-        )
-
-        return ChartResponse(
-            success=True,
-            chart_html=chart_html
-        )
-
-    except Exception as e:
-        logger.error(f"Chart error: {str(e)}")
-        return ChartResponse(
-            success=False,
-            error=str(e)
-        )
-
-@app.post("/search_image", response_model=ImageSearchResponse)
-async def search_image(request: ImageSearchRequest):
-    """
-    Search similar products by image using CLIP
-    """
-    try:
-        # Decode base64 image
-        image_bytes = base64.b64decode(request.image)
-
-        # Search
-        results = clip_searcher.search(image_bytes, request.top_k)
-
-        return ImageSearchResponse(
-            success=True,
-            products=results
-        )
-
-    except Exception as e:
-        logger.error(f"Image search error: {str(e)}")
-        return ImageSearchResponse(
-            success=False,
-            error=str(e)
-        )
-
-@app.get("/conversation/{conversation_id}")
-async def get_conversation(conversation_id: str):
-    """
-    Retrieve conversation history
-    """
-    try:
-        messages = ConversationStorage.load(conversation_id)
-
-        return {
-            "success": True,
-            "conversation_id": conversation_id,
-            "messages": messages
-        }
-
-    except Exception as e:
-        logger.error(f"Error retrieving conversation: {str(e)}")
-        return {
-            "success": False,
-            "error": str(e)
-        }
-
-@app.post("/feedback")
-async def submit_feedback(request: FeedbackRequest):
-    """
-    Submit feedback for a message
-    """
-    try:
-        FeedbackManager.save_feedback(
-            request.message_id,
-            request.feedback_type,
-            request.comment
-        )
-
-        return {
-            "success": True,
-            "message": "Feedback submitted"
-        }
-
-    except Exception as e:
-        logger.error(f"Feedback error: {str(e)}")
-        return {
-            "success": False,
-            "error": str(e)
-        }
-
-# ============================================================================
-# STARTUP & SHUTDOWN
-# ============================================================================
-
-@app.on_event("startup")
-async def startup_event():
-    """Run on startup"""
-    logger.info("="*80)
-    logger.info("  CUSTOMER MANAGEMENT LLM API - STARTING (HF VERSION)")
-    logger.info("="*80)
-    logger.info(f"Environment: {detect_environment()}")
-    logger.info(f"Project Root: {PROJECT_ROOT}")
-    logger.info(f"Data Source: HF Dataset ({data_loader.repo_id})")
-    logger.info(f"HuggingFace Available: {hf_client.is_available()}")
-    logger.info("="*80)
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Run on shutdown"""
-    logger.info("API shutting down...")
-
-# ============================================================================
-# MAIN
-# ============================================================================
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=8000,
-        log_level="info"
-    )
+logger.info("="*80)
+logger.info("  CUSTOMER MANAGEMENT LLM - STREAMLIT VERSION")
+logger.info("="*80)
+logger.info(f"Environment: {detect_environment()}")
+logger.info(f"Project Root: {PROJECT_ROOT}")
+logger.info(f"Data Source: HF Dataset ({data_loader.repo_id})")
+logger.info(f"HuggingFace Available: {hf_client.is_available()}")
+logger.info("="*80)
