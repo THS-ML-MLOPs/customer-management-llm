@@ -6,9 +6,9 @@
 """
 
 import streamlit as st
-from components.sidebar import render_sidebar
-from components.action_cards import render_action_cards
-from components.chat_interface import render_chat_interface
+from ui_files.components.sidebar import render_sidebar
+from ui_files.components.action_cards import render_action_cards
+from ui_files.components.chat_interface import render_chat_interface
 
 def render():
     """
