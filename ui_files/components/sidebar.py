@@ -101,3 +101,7 @@ def render_sidebar():
             </div>
         </div>
         """, unsafe_allow_html=True)
+
+        # Footer
+        st.markdown("---")
+        st.caption("🤖 Powered by AI")

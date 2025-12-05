@@ -35,9 +35,48 @@ def render_chat_interface():
     # Initialize conversation
     if 'conversation_id' not in st.session_state:
         st.session_state.conversation_id = str(uuid.uuid4())
-    
+
     if 'messages' not in st.session_state:
         st.session_state.messages = []
+
+    # Process first message if coming from welcome screen
+    if 'first_message' in st.session_state:
+        first_msg = st.session_state.first_message
+        del st.session_state.first_message
+
+        # Add user message
+        st.session_state.messages.append({
+            'role': 'user',
+            'content': first_msg,
+            'timestamp': datetime.now().isoformat()
+        })
+
+        # Get response from LLM
+        result = llm_client.chat(
+            message=first_msg,
+            conversation_id=st.session_state.conversation_id,
+            stream=False
+        )
+
+        if result.get('success'):
+            response_text = result.get('response', '')
+            message_id = result.get('message_id')
+
+            # Add assistant response
+            st.session_state.messages.append({
+                'role': 'assistant',
+                'content': response_text,
+                'message_id': message_id,
+                'timestamp': datetime.now().isoformat()
+            })
+        else:
+            # Add error message
+            error_msg = result.get('error', 'Unknown error')
+            st.session_state.messages.append({
+                'role': 'assistant',
+                'content': f"❌ Error: {error_msg}",
+                'timestamp': datetime.now().isoformat()
+            })
     
     # Chat header
     col1, col2, col3 = st.columns([3, 1, 1])

@@ -65,10 +65,5 @@ def render():
     
     else:
         # Show full chat interface
+        # chat_interface will handle first_message automatically
         render_chat_interface()
-        
-        # Process first message if exists
-        if 'first_message' in st.session_state:
-            # This will be processed by chat_interface
-            st.session_state.chat_input_field = st.session_state.first_message
-            del st.session_state.first_message
