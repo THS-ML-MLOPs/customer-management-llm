@@ -77,7 +77,9 @@ class HuggingFaceClient:
     """Client for Hugging Face Inference API using official InferenceClient"""
 
     def __init__(self):
-        # Get HF token from environment or Streamlit Secrets
+        self.model_id = "meta-llama/Meta-Llama-3-8B-Instruct"
+
+        # Get HF token from environment OR Streamlit Secrets
         self.hf_token = os.environ.get("HF_TOKEN")
 
         # Fallback to Streamlit Secrets if not in environment
@@ -86,20 +88,17 @@ class HuggingFaceClient:
                 import streamlit as st
                 self.hf_token = st.secrets.get("HF_TOKEN")
                 if self.hf_token:
-                    logger.info("HF_TOKEN loaded from Streamlit Secrets")
-            except:
-                pass
+                    logger.info("✅ HF_TOKEN loaded from Streamlit Secrets")
+            except Exception as e:
+                logger.debug(f"Could not load from Streamlit Secrets: {e}")
 
         if not self.hf_token:
-            logger.warning("HF_TOKEN not found in environment or Streamlit Secrets. API calls may fail.")
+            logger.warning("❌ HF_TOKEN not found in environment or Streamlit Secrets")
 
-        # Model configuration
-        self.model_id = "meta-llama/Meta-Llama-3-8B-Instruct"
-
-        # Initialize InferenceClient with timeout
+        # Inicializar InferenceClient
         self.client = InferenceClient(
             model=self.model_id,
-            token=self.hf_token,
+            token=self.hf_token,  # ← IMPORTANTE: passar token!
             timeout=60
         )
 
