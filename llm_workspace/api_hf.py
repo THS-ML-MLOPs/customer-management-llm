@@ -17,8 +17,8 @@ from typing import Optional, List, Dict, Any
 from datetime import datetime
 import logging
 
-# HuggingFace official client
-from huggingface_hub import InferenceClient
+# HTTP requests for HuggingFace API
+import requests
 
 # Data Loader (loads from HF Dataset)
 from .data_loader import get_data_loader, get_parquet_path, get_embeddings_paths
@@ -74,7 +74,7 @@ logger.info(f"Data Loader initialized - will load from HF Dataset")
 # ============================================================================
 
 class HuggingFaceClient:
-    """Client for Hugging Face Inference API using official InferenceClient"""
+    """Client for Hugging Face Inference API using direct requests"""
 
     def __init__(self):
         self.model_id = "meta-llama/Meta-Llama-3-8B-Instruct"
@@ -95,27 +95,29 @@ class HuggingFaceClient:
         if not self.hf_token:
             logger.warning("❌ HF_TOKEN not found in environment or Streamlit Secrets")
 
-        # Inicializar InferenceClient
-        self.client = InferenceClient(
-            model=self.model_id,
-            token=self.hf_token,  # ← IMPORTANTE: passar token!
-            timeout=60
-        )
+        # URL CORRETA da HuggingFace API (não usar InferenceClient deprecado)
+        self.api_url = "https://api.huggingface.co/v1/chat/completions"
 
-        logger.info(f"HuggingFace InferenceClient initialized")
+        logger.info(f"✅ HuggingFace Client initialized")
         logger.info(f"Model: {self.model_id}")
+        logger.info(f"API URL: {self.api_url}")
 
-    def chat(self, message: str, conversation_history: List[Dict] = None) -> str:
+    def chat(self, message: str, conversation_history: List[Dict] = None, max_tokens: int = 500, temperature: float = 0.7) -> str:
         """
-        Send chat message to Hugging Face using InferenceClient
+        Send chat message to Hugging Face using direct API call
 
         Args:
             message: User message
             conversation_history: Previous conversation messages
+            max_tokens: Maximum tokens in response
+            temperature: Sampling temperature
 
         Returns:
             Assistant response as string
         """
+        if not self.hf_token:
+            return "Error: HF_TOKEN not configured"
+
         try:
             # Build messages array from conversation history
             messages = []
@@ -138,98 +140,48 @@ class HuggingFaceClient:
                 "content": message
             })
 
-            # Call HF Inference API using chat_completion
-            response = self.client.chat_completion(
-                messages=messages,
-                max_tokens=800,
-                temperature=0.7,
-                top_p=0.9
+            # Call HuggingFace API directly with requests
+            response = requests.post(
+                self.api_url,
+                headers={
+                    "Authorization": f"Bearer {self.hf_token}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": self.model_id,
+                    "messages": messages,
+                    "max_tokens": max_tokens,
+                    "temperature": temperature
+                },
+                timeout=60
             )
 
-            # Extract response from chat completion
-            if hasattr(response, 'choices') and len(response.choices) > 0:
-                assistant_message = response.choices[0].message.content
-                return assistant_message.strip()
-            else:
-                raise ValueError("Invalid response format from API")
+            # Check for HTTP errors
+            response.raise_for_status()
 
-        except AttributeError as e:
-            # If chat_completion doesn't work, try text_generation fallback
-            logger.warning(f"chat_completion failed, using text_generation fallback: {e}")
-            return self._fallback_text_generation(message, conversation_history)
+            # Parse response
+            result = response.json()
+            assistant_message = result["choices"][0]["message"]["content"]
+            return assistant_message.strip()
 
+        except requests.exceptions.HTTPError as e:
+            logger.error(f"HTTP error: {e.response.status_code} - {e.response.text}")
+            return f"Error: API returned {e.response.status_code}. Please check your HF_TOKEN and model access."
+        except requests.exceptions.Timeout:
+            logger.error("Request timeout")
+            return "Error: Request timed out. Please try again."
         except Exception as e:
-            logger.error(f"HuggingFace API error: {str(e)}")
-            # Try fallback method
-            try:
-                return self._fallback_text_generation(message, conversation_history)
-            except Exception as fallback_error:
-                logger.error(f"Fallback also failed: {fallback_error}")
-                return f"Sorry, I'm having trouble connecting to the AI service. Please try again later.\n\nError: {str(e)}"
-
-    def _fallback_text_generation(self, message: str, conversation_history: List[Dict] = None) -> str:
-        """
-        Fallback method using text_generation if chat_completion fails
-        """
-        try:
-            # Build prompt from conversation history
-            prompt = self._build_prompt_from_history(conversation_history or [], message)
-
-            # Call text_generation
-            response = self.client.text_generation(
-                prompt,
-                max_new_tokens=800,
-                temperature=0.7,
-                top_p=0.9,
-                do_sample=True,
-                return_full_text=False
-            )
-
-            return response.strip()
-
-        except Exception as e:
-            logger.error(f"text_generation fallback error: {e}")
-            raise
-
-    def _build_prompt_from_history(self, history: List[Dict], new_message: str) -> str:
-        """Build Llama 3 format prompt from conversation history"""
-        prompt = "<|begin_of_text|>"
-
-        for msg in history:
-            role = msg.get('role', 'user')
-            content = msg.get('content', '')
-
-            if role == 'user':
-                prompt += f"<|start_header_id|>user<|end_header_id|>\n{content}<|eot_id|>"
-            elif role == 'assistant':
-                prompt += f"<|start_header_id|>assistant<|end_header_id|>\n{content}<|eot_id|>"
-
-        # Add new user message
-        prompt += f"<|start_header_id|>user<|end_header_id|>\n{new_message}<|eot_id|>"
-        prompt += "<|start_header_id|>assistant<|end_header_id|>"
-
-        return prompt
+            logger.error(f"Chat error: {str(e)}")
+            return f"Error: {str(e)}"
 
     def is_available(self) -> bool:
         """
-        Check if HF API is available by testing connection
+        Check if HF API is available (checks if token exists)
 
         Returns:
-            True if API is accessible, False otherwise
+            True if token is configured, False otherwise
         """
-        if not self.hf_token:
-            return False
-
-        try:
-            # Test with a simple generation
-            test_response = self.client.text_generation(
-                "Hello",
-                max_new_tokens=5
-            )
-            return True
-        except Exception as e:
-            logger.error(f"HF Client availability check failed: {e}")
-            return False
+        return self.hf_token is not None
 
 # Initialize HF client
 hf_client = HuggingFaceClient()
