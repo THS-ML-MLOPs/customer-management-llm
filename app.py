@@ -68,44 +68,13 @@ if not os.environ.get("HF_TOKEN"):
     st.stop()
 
 # ============================================================================
-# SIDEBAR INFO
+# FOOTER (minimal status)
 # ============================================================================
 
+# Minimal status in footer (not sidebar)
 with st.sidebar:
     st.markdown("---")
-
-    # Status indicator
-    if hf_client.is_available():
-        st.success("✅ HuggingFace: Online")
-    else:
-        st.error("❌ HuggingFace: Offline")
-
-    # Don't check DuckDB during sidebar render to avoid blocking startup
-    # DuckDB will be initialized on-demand when user makes a query
-    st.success("✅ DuckDB: Ready")
-
-    st.markdown("---")
-
-    # Model info
-    with st.expander("ℹ️ Sobre o Sistema"):
-        st.markdown("""
-        **LLM:** Llama 3.1 8B Instruct
-
-        **Recursos:**
-        - 💬 Chat com IA
-        - 📊 Query de dados
-        - 📈 Geração de gráficos
-        - 🖼️ Busca por imagem (CLIP)
-
-        **Tecnologias:**
-        - Hugging Face Inference API
-        - DuckDB (SQL em parquet)
-        - Streamlit
-        - Plotly
-        """)
-
-    st.markdown("---")
-    st.caption("🤖 Powered by HuggingFace")
+    st.caption("🤖 Powered by AI")
 
 # ============================================================================
 # ROUTER

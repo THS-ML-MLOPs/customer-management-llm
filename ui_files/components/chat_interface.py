@@ -20,17 +20,16 @@ def render_chat_interface():
     # Initialize LLM client
     llm_client = get_llm_client()
     
-    # Check API health
+    # Check LLM client health
     if 'api_health_checked' not in st.session_state:
-        with st.spinner("🔍 Checking API connection..."):
-            api_healthy = llm_client.health_check()
-            st.session_state.api_healthy = api_healthy
-            st.session_state.api_health_checked = True
-    
-    # Show API status
+        api_healthy = llm_client.health_check()
+        st.session_state.api_healthy = api_healthy
+        st.session_state.api_health_checked = True
+
+    # Show LLM status (if offline)
     if not st.session_state.get('api_healthy', False):
-        st.error("❌ API not responding. Make sure FastAPI server is running.")
-        st.code("python -m uvicorn api:app --host 0.0.0.0 --port 8000")
+        st.warning("⚠️ HuggingFace token not configured. Chat will not work.")
+        st.info("💡 Configure HF_TOKEN in Streamlit Secrets or environment variables.")
         return
     
     # Initialize conversation

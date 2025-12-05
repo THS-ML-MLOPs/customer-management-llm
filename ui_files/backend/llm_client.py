@@ -1,166 +1,148 @@
 """
 ================================================================================
-    LLM CLIENT
-    HTTP client for FastAPI backend
-    Handles: Chat, Queries, Charts, Image Search
+    LLM CLIENT (STREAMLIT VERSION)
+    Direct integration with HF client - no HTTP requests needed
 ================================================================================
 """
 
-import requests
-import json
-from typing import Dict, List, Optional, Any, Generator
-from pathlib import Path
-import base64
-import time
+from typing import Dict, List, Optional, Any
+import uuid
+from datetime import datetime
+import logging
+
+# Import HF client directly (no HTTP needed)
+from llm_workspace.api_hf import (
+    hf_client,
+    duckdb_client,
+    ConversationStorage,
+    FeedbackManager,
+    generate_plotly_chart,
+    clip_searcher
+)
+
+logger = logging.getLogger(__name__)
+
 
 class LLMClient:
     """
-    Client for FastAPI LLM backend
+    Client for LLM operations - calls hf_client directly
+    No FastAPI server needed!
     """
-    
-    def __init__(self, base_url: str = "http://localhost:8000"):
-        """
-        Initialize LLM client
-        
-        Args:
-            base_url: FastAPI server URL
-        """
-        self.base_url = base_url
-        self.timeout = 120  # 2 minutes for complex queries
-    
+
+    def __init__(self):
+        """Initialize LLM client"""
+        self.hf_client = hf_client
+        self.duckdb_client = duckdb_client
+        logger.info("LLMClient initialized (direct mode)")
+
     def health_check(self) -> bool:
         """
-        Check if API is alive
-        
+        Check if HF client is available
+
         Returns:
-            bool: True if API is responsive
+            bool: True if HF API is available
         """
-        try:
-            response = requests.get(f"{self.base_url}/health", timeout=5)
-            return response.status_code == 200
-        except:
-            return False
-    
+        return self.hf_client.is_available()
+
     def chat(
-        self, 
-        message: str, 
+        self,
+        message: str,
         conversation_id: Optional[str] = None,
         stream: bool = False
     ) -> Dict[str, Any]:
         """
-        Send chat message to LLM
-        
+        Send chat message to LLM (direct call to hf_client)
+
         Args:
             message: User message
             conversation_id: Optional conversation ID for context
-            stream: Whether to stream response
-        
+            stream: Not used (kept for compatibility)
+
         Returns:
             Dict with response
         """
-        payload = {
-            "message": message,
-            "conversation_id": conversation_id,
-            "stream": stream
-        }
-        
         try:
-            response = requests.post(
-                f"{self.base_url}/chat",
-                json=payload,
-                timeout=self.timeout
-            )
-            response.raise_for_status()
-            return response.json()
-        
-        except requests.exceptions.Timeout:
+            # Generate conversation ID if not provided
+            if not conversation_id:
+                conversation_id = str(uuid.uuid4())
+
+            # Load conversation history
+            history = ConversationStorage.load(conversation_id)
+
+            # Get response from HuggingFace (direct call)
+            response_text = self.hf_client.chat(message, conversation_history=history)
+
+            # Generate message ID
+            message_id = str(uuid.uuid4())
+
+            # Update history
+            history.append({"role": "user", "content": message})
+            history.append({
+                "role": "assistant",
+                "content": response_text,
+                "message_id": message_id
+            })
+
+            # Save conversation
+            ConversationStorage.save(conversation_id, history)
+
             return {
-                "error": "Request timed out. The query may be too complex.",
-                "success": False
+                "success": True,
+                "response": response_text,
+                "message_id": message_id,
+                "conversation_id": conversation_id
             }
-        except requests.exceptions.RequestException as e:
-            return {
-                "error": f"API error: {str(e)}",
-                "success": False
-            }
-    
-    def chat_stream(
-        self,
-        message: str,
-        conversation_id: Optional[str] = None
-    ) -> Generator[str, None, None]:
-        """
-        Stream chat response
-        
-        Args:
-            message: User message
-            conversation_id: Optional conversation ID
-        
-        Yields:
-            Chunks of response text
-        """
-        payload = {
-            "message": message,
-            "conversation_id": conversation_id,
-            "stream": True
-        }
-        
-        try:
-            with requests.post(
-                f"{self.base_url}/chat",
-                json=payload,
-                stream=True,
-                timeout=self.timeout
-            ) as response:
-                response.raise_for_status()
-                
-                for line in response.iter_lines():
-                    if line:
-                        try:
-                            data = json.loads(line.decode('utf-8'))
-                            if 'chunk' in data:
-                                yield data['chunk']
-                        except json.JSONDecodeError:
-                            continue
-        
+
         except Exception as e:
-            yield f"\n\n❌ Error: {str(e)}"
-    
+            logger.error(f"Chat error: {str(e)}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+
     def query_data(
         self,
         query: str,
         parameters: Optional[Dict] = None
     ) -> Dict[str, Any]:
         """
-        Execute DuckDB query
-        
+        Execute DuckDB query (direct call to duckdb_client)
+
         Args:
             query: Natural language or SQL query
             parameters: Optional query parameters
-        
+
         Returns:
             Dict with query results
         """
-        payload = {
-            "query": query,
-            "parameters": parameters or {}
-        }
-        
         try:
-            response = requests.post(
-                f"{self.base_url}/query",
-                json=payload,
-                timeout=60
-            )
-            response.raise_for_status()
-            return response.json()
-        
-        except Exception as e:
+            import time
+            start_time = time.time()
+
+            # Convert natural language to SQL
+            sql = self.duckdb_client.natural_language_to_sql(query)
+
+            logger.info(f"Generated SQL: {sql}")
+
+            # Execute query
+            results = self.duckdb_client.query(sql)
+
+            execution_time = time.time() - start_time
+
             return {
-                "error": f"Query error: {str(e)}",
-                "success": False
+                "success": True,
+                "data": results,
+                "sql_used": sql,
+                "execution_time": execution_time
             }
-    
+
+        except Exception as e:
+            logger.error(f"Query error: {str(e)}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+
     def generate_chart(
         self,
         data: Dict[str, Any],
@@ -169,109 +151,93 @@ class LLMClient:
         config: Optional[Dict] = None
     ) -> Dict[str, Any]:
         """
-        Generate Plotly chart
-        
+        Generate Plotly chart (direct call to generate_plotly_chart)
+
         Args:
             data: Chart data
             chart_type: Type of chart (bar, line, scatter, etc)
             title: Chart title
             config: Optional chart configuration
-        
+
         Returns:
             Dict with chart HTML and metadata
         """
-        payload = {
-            "data": data,
-            "chart_type": chart_type,
-            "title": title,
-            "config": config or {}
-        }
-        
         try:
-            response = requests.post(
-                f"{self.base_url}/chart",
-                json=payload,
-                timeout=30
+            chart_html = generate_plotly_chart(
+                data,
+                chart_type,
+                title,
+                config or {}
             )
-            response.raise_for_status()
-            return response.json()
-        
-        except Exception as e:
+
             return {
-                "error": f"Chart generation error: {str(e)}",
-                "success": False
+                "success": True,
+                "chart_html": chart_html
             }
-    
+
+        except Exception as e:
+            logger.error(f"Chart generation error: {str(e)}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+
     def search_image(
         self,
-        image_path: Optional[str] = None,
-        image_bytes: Optional[bytes] = None,
+        image_bytes: bytes,
         top_k: int = 5
     ) -> Dict[str, Any]:
         """
-        Search similar products by image using CLIP
-        
+        Search similar products by image using CLIP (direct call to clip_searcher)
+
         Args:
-            image_path: Path to image file
             image_bytes: Image as bytes
             top_k: Number of results to return
-        
+
         Returns:
             Dict with similar products
         """
-        # Read image
-        if image_path:
-            with open(image_path, 'rb') as f:
-                image_data = base64.b64encode(f.read()).decode('utf-8')
-        elif image_bytes:
-            image_data = base64.b64encode(image_bytes).decode('utf-8')
-        else:
-            return {"error": "No image provided", "success": False}
-        
-        payload = {
-            "image": image_data,
-            "top_k": top_k
-        }
-        
         try:
-            response = requests.post(
-                f"{self.base_url}/search_image",
-                json=payload,
-                timeout=30
-            )
-            response.raise_for_status()
-            return response.json()
-        
-        except Exception as e:
+            results = clip_searcher.search(image_bytes, top_k)
+
             return {
-                "error": f"Image search error: {str(e)}",
-                "success": False
+                "success": True,
+                "products": results
             }
-    
+
+        except Exception as e:
+            logger.error(f"Image search error: {str(e)}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+
     def get_conversation(self, conversation_id: str) -> Dict[str, Any]:
         """
         Retrieve conversation history
-        
+
         Args:
             conversation_id: Conversation ID
-        
+
         Returns:
             Dict with conversation data
         """
         try:
-            response = requests.get(
-                f"{self.base_url}/conversation/{conversation_id}",
-                timeout=10
-            )
-            response.raise_for_status()
-            return response.json()
-        
-        except Exception as e:
+            messages = ConversationStorage.load(conversation_id)
+
             return {
-                "error": f"Error retrieving conversation: {str(e)}",
-                "success": False
+                "success": True,
+                "conversation_id": conversation_id,
+                "messages": messages
             }
-    
+
+        except Exception as e:
+            logger.error(f"Error retrieving conversation: {str(e)}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+
     def submit_feedback(
         self,
         message_id: str,
@@ -280,50 +246,49 @@ class LLMClient:
     ) -> Dict[str, Any]:
         """
         Submit feedback (like/dislike)
-        
+
         Args:
             message_id: Message ID to give feedback on
             feedback_type: 'like' or 'dislike'
             comment: Optional comment
-        
+
         Returns:
             Dict with success status
         """
-        payload = {
-            "message_id": message_id,
-            "feedback_type": feedback_type,
-            "comment": comment
-        }
-        
         try:
-            response = requests.post(
-                f"{self.base_url}/feedback",
-                json=payload,
-                timeout=10
+            FeedbackManager.save_feedback(
+                message_id,
+                feedback_type,
+                comment
             )
-            response.raise_for_status()
-            return response.json()
-        
-        except Exception as e:
+
             return {
-                "error": f"Feedback error: {str(e)}",
-                "success": False
+                "success": True,
+                "message": "Feedback submitted"
+            }
+
+        except Exception as e:
+            logger.error(f"Feedback error: {str(e)}")
+            return {
+                "success": False,
+                "error": str(e)
             }
 
 
 # Singleton instance
 _llm_client = None
 
+
 def get_llm_client() -> LLMClient:
     """
     Get or create LLM client singleton
-    
+
     Returns:
         LLMClient instance
     """
     global _llm_client
-    
+
     if _llm_client is None:
         _llm_client = LLMClient()
-    
+
     return _llm_client

@@ -77,11 +77,21 @@ class HuggingFaceClient:
     """Client for Hugging Face Inference API"""
 
     def __init__(self):
-        # Get HF token from environment
+        # Get HF token from environment or Streamlit Secrets
         self.hf_token = os.environ.get("HF_TOKEN")
 
+        # Fallback to Streamlit Secrets if not in environment
         if not self.hf_token:
-            logger.warning("HF_TOKEN not found in environment. API calls may fail.")
+            try:
+                import streamlit as st
+                self.hf_token = st.secrets.get("HF_TOKEN")
+                if self.hf_token:
+                    logger.info("HF_TOKEN loaded from Streamlit Secrets")
+            except:
+                pass
+
+        if not self.hf_token:
+            logger.warning("HF_TOKEN not found in environment or Streamlit Secrets. API calls may fail.")
 
         # Initialize client with Llama model
         self.client = InferenceClient(
