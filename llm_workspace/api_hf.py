@@ -17,8 +17,8 @@ from typing import Optional, List, Dict, Any
 from datetime import datetime
 import logging
 
-# Hugging Face
-from huggingface_hub import InferenceClient
+# HTTP requests for HuggingFace API
+import requests
 
 # Data Loader (loads from HF Dataset)
 from .data_loader import get_data_loader, get_parquet_path, get_embeddings_paths
@@ -74,7 +74,7 @@ logger.info(f"Data Loader initialized - will load from HF Dataset")
 # ============================================================================
 
 class HuggingFaceClient:
-    """Client for Hugging Face Inference API"""
+    """Client for Hugging Face Inference API (New Chat Completions API)"""
 
     def __init__(self):
         # Get HF token from environment or Streamlit Secrets
@@ -93,59 +93,86 @@ class HuggingFaceClient:
         if not self.hf_token:
             logger.warning("HF_TOKEN not found in environment or Streamlit Secrets. API calls may fail.")
 
-        # Initialize client with Llama model
-        self.client = InferenceClient(
-            model="meta-llama/Llama-3.1-8B-Instruct",
-            token=self.hf_token
-        )
+        # New API configuration
+        self.model_id = "meta-llama/Llama-3.1-8B-Instruct"
+        self.api_url = "https://api.huggingface.co/v1/chat/completions"
 
-        logger.info("HuggingFace client initialized with Llama-3.1-8B-Instruct")
+        logger.info("HuggingFace client initialized with new Chat Completions API")
+        logger.info(f"Model: {self.model_id}")
 
     def chat(self, message: str, conversation_history: List[Dict] = None) -> str:
         """
-        Send chat message to Hugging Face
+        Send chat message to Hugging Face using new Chat Completions API
         """
         try:
-            # Build prompt from conversation history
-            if conversation_history:
-                prompt = self._build_prompt_from_history(conversation_history, message)
-            else:
-                prompt = f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n{message}<|eot_id|><|start_header_id|>assistant<|end_header_id|>"
+            # Build messages array from conversation history
+            messages = []
 
-            # Call HF Inference API
-            response = self.client.text_generation(
-                prompt=prompt,
-                max_new_tokens=1000,
-                temperature=0.7,
-                top_p=0.9,
-                repetition_penalty=1.1,
-                do_sample=True
+            if conversation_history:
+                for msg in conversation_history:
+                    role = msg.get('role', 'user')
+                    content = msg.get('content', '')
+
+                    # Only add user and assistant messages
+                    if role in ['user', 'assistant']:
+                        messages.append({
+                            "role": role,
+                            "content": content
+                        })
+
+            # Add new user message
+            messages.append({
+                "role": "user",
+                "content": message
+            })
+
+            # Call new HF Chat Completions API
+            response = requests.post(
+                self.api_url,
+                headers={
+                    "Authorization": f"Bearer {self.hf_token}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": self.model_id,
+                    "messages": messages,
+                    "max_tokens": 1000,
+                    "temperature": 0.7,
+                    "top_p": 0.9,
+                    "stream": False
+                },
+                timeout=60
             )
 
-            return response.strip()
+            # Check for HTTP errors
+            response.raise_for_status()
+
+            # Parse response
+            result = response.json()
+
+            # Extract generated text from new API format
+            if "choices" in result and len(result["choices"]) > 0:
+                assistant_message = result["choices"][0]["message"]["content"]
+                return assistant_message.strip()
+            else:
+                raise ValueError("Invalid response format from API")
+
+        except requests.exceptions.HTTPError as e:
+            error_msg = f"HTTP {e.response.status_code}: {e.response.text}"
+            logger.error(f"HuggingFace API HTTP error: {error_msg}")
+            return f"Error: {error_msg}"
+
+        except requests.exceptions.Timeout:
+            logger.error("HuggingFace API timeout")
+            return "Error: Request timed out. Please try again."
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"HuggingFace API request error: {str(e)}")
+            return f"Error: {str(e)}"
 
         except Exception as e:
             logger.error(f"HuggingFace API error: {str(e)}")
             return f"Error: {str(e)}"
-
-    def _build_prompt_from_history(self, history: List[Dict], new_message: str) -> str:
-        """Build Llama 3.1 format prompt from conversation history"""
-        prompt = "<|begin_of_text|>"
-
-        for msg in history:
-            role = msg['role']
-            content = msg['content']
-
-            if role == 'user':
-                prompt += f"<|start_header_id|>user<|end_header_id|>\n{content}<|eot_id|>"
-            elif role == 'assistant':
-                prompt += f"<|start_header_id|>assistant<|end_header_id|>\n{content}<|eot_id|>"
-
-        # Add new user message
-        prompt += f"<|start_header_id|>user<|end_header_id|>\n{new_message}<|eot_id|>"
-        prompt += "<|start_header_id|>assistant<|end_header_id|>"
-
-        return prompt
 
     def is_available(self) -> bool:
         """Check if HF API is available"""
